@@ -33,6 +33,11 @@ propellant.set('Xe')
 rt = OptionMenu(root, propellant, 'Xe', 'Ar', 'Bi', 'Kr', 'I')
 rt.grid(row=2, column=1)
 
+res = Label(root)
+result = Label(root)
+rasm = Label(root)
+wrong = Label(root)
+
 
 # CONST
 
@@ -53,13 +58,29 @@ Ik = 1
 
 
 def reformat(num):
-    if num < 10000 and num > 0.01:
+    if 10000 > num > 0.01:
         return round(num, 2)
     else:
         return format(num, '.2e')
 
 
+def diam(m):
+    return 0.00195 * m**3 - 0.267035 * m**2 + 13.149984 * m + 20.49869
+
+
+def y(m):
+    return 1.176*10**-9 * m**4 - 7.995457*10**-7*m**3 + 1.736478*10**-4*m**2 - 9.85489 * 10**-3*m + 0.3865574
+
+
 def solve():
+    global res
+    global result
+    global rasm
+    global wrong
+    res.destroy()
+    result.destroy()
+    rasm.destroy()
+    wrong.destroy()
 
     # Get variables
     if vr.get() == 'мН':
@@ -92,66 +113,74 @@ def solve():
     D = b ** 2 - 4 * a * c
     if D < 0:
         wrong = Label(root, text='Невозможно рассчитать')
-        wrong.grid(row=4, column=0)
+        wrong.grid(row=5, column=0)
         root.mainloop()
     else:
         m = (-b - math.sqrt(D))/(2 * a)
-        f_eff = F ** 2 / (2 * N * m)
+        f_eff = F ** 2 / (2 * N * m) * 100
         Iud = F / (m * g)
         Vi = g * Iud / 0.835
         Ur = M * Vi ** 2 / (2 * e)
         Ir = e * m * 1.25 / M
-
+        Dsr = diam(m*10**6)
+        w = y(m*10**6)
+        Sk = N/w
+        bk = Sk/(const.pi * Dsr)
+        Dvn = Dsr + bk
+        lk = 2 * bk
+        st = 0.5 * bk
 
         # Print solution
-        res1 = Label(root, text='Массовый расход: ')
-        res1.grid(row=4, column=0)
-        res2 = Label(root, text='Тяговый КПД: ')
-        res2.grid(row=5, column=0)
-        res3 = Label(root, text='Удельный импульс: ')
-        res3.grid(row=6, column=0)
-        res4 = Label(root, text='Разрядное напряжение: ')
-        res4.grid(row=7, column=0)
-        res5 = Label(root, text='Разрядный ток: ')
-        res5.grid(row=8, column=0)
-        res6 = Label(root, text='Средний диаметр: ')
-        res6.grid(row=9, column=0)
-        res7 = Label(root, text='Ширина канала: ')
-        res7.grid(row=10, column=0)
-        res8 = Label(root, text='Внешний диаметр канала: ')
-        res8.grid(row=11, column=0)
-        res9 = Label(root, text='Длина канала: ')
-        res9.grid(row=12, column=0)
-        res10 = Label(root, text='Толщина стенки канала: ')
-        res10.grid(row=13, column=0)
+        res_label = Label(root, text='Результаты расчётов')
+        res_label.grid(row=4, column=1)
 
-        re = Label(root, text='Результаты расчётов')
-        re.grid(row=3, column=1)
-        res1a = Label(root, text=reformat(m))
-        res1a.grid(row=4, column=1)
-        res2a = Label(root, text=reformat(f_eff))
-        res2a.grid(row=5, column=1)
-        res3a = Label(root, text=reformat(Iud))
-        res3a.grid(row=6, column=1)
-        res4a = Label(root, text=reformat(Ur))
-        res4a.grid(row=7, column=1)
-        res5a = Label(root, text=reformat(Ir))
-        res5a.grid(row=8, column=1)
-        res6a = Label(root, text='-')
-        res6a.grid(row=9, column=1)
-        res7a = Label(root, text='-')
-        res7a.grid(row=10, column=1)
-        res8a = Label(root, text='-')
-        res8a.grid(row=11, column=1)
-        res9a = Label(root, text='-')
-        res9a.grid(row=12, column=1)
-        res10a = Label(root, text='-')
-        res10a.grid(row=13, column=1)
+        space = Label(root, text='\n')
+        space.grid(row=5, column=3)
+
+        res = Label(root, text="""Массовый расход: \n
+        Тяговый КПД: \n
+        Удельный импульс: \n
+        Разрядное напряжение: \n
+        Разрядный ток: \n
+        Средний диаметр: \n
+        Ширина канала: \n
+        Внешний диаметр канала: \n
+        Длина канала: \n
+        Толщина стенки канала: 
+        """)
+        res.grid(row=6, column=0)
+
+        result = Label(root, text =
+        '{} \n \n {} \n \n{} \n \n {} \n \n {} \n \n {} \n \n {} \n \n {} \n \n {} \n \n {}\n'.format(
+                                                                             reformat(m*10**6),
+                                                                             round(f_eff, 1),
+                                                                             round(Iud),
+                                                                             round(Ur),
+                                                                             reformat(Ir),
+                                                                             round(Dsr),
+                                                                             round(bk),
+                                                                             round(Dvn),
+                                                                             round(lk), round(st)))
+        result.grid(row=6, column=1)
+
+        rasm = Label(root, text="""        мг/c \n
+            % \n
+            сек \n
+            В \n
+            А \n
+            мм \n
+            мм \n
+            мм \n
+            мм \n
+            мм 
+                """)
+        rasm.grid(row=6, column=2)
+
         root.mainloop()
 
 
 myButton = Button(root, text='Рассчитать', command=solve)
-myButton.grid(row=49, column=0)
+myButton.grid(row=3, column=0)
 
 root.mainloop()
 
