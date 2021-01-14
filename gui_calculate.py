@@ -1,42 +1,46 @@
 from tkinter import *
+from PIL import ImageTk, Image
 import scipy.constants as const
 import math
 
 # Create input window
-
 root = Tk()
 root.title('Расчет параметров ЭРД')
+root.iconbitmap('Pictures/di.ico')
+# root.geometry('800x500')
 
 power = Label(root, text='Мощность двигателя: ')
-power.grid(row=0, column=0)
+power.grid(row=0, column=2)
 ePower = Entry(root)
-ePower.grid(row=0, column=1)
+ePower.grid(row=0, column=3)
 ePower.insert(0, '1350')
 vt = Label(root, text='Вт')
-vt.grid(row=0, column=2)
+vt.grid(row=0, column=4)
 
 thrust = Label(root, text='Тяга двигателя: ')
-thrust.grid(row=1, column=0)
+thrust.grid(row=1, column=2)
 eThrust = Entry(root)
-eThrust.grid(row=1, column=1)
+eThrust.grid(row=1, column=3)
 eThrust.insert(0, '8')
 vr = StringVar()
 vr.set('г')
 measure = OptionMenu(root, vr, 'г', 'мН')
-measure.grid(row=1, column=2)
+measure.grid(row=1, column=4)
 
 
 fuel = Label(root, text='Рабочее тело: ')
-fuel.grid(row=2, column=0)
+fuel.grid(row=2, column=2)
 propellant = StringVar()
 propellant.set('Xe')
 rt = OptionMenu(root, propellant, 'Xe', 'Ar', 'Bi', 'Kr', 'I')
-rt.grid(row=2, column=1)
+rt.grid(row=2, column=3)
 
 res = Label(root)
 result = Label(root)
 rasm = Label(root)
 wrong = Label(root)
+img_label = Label(root)
+magnet_button = Button(root)
 
 
 # CONST
@@ -49,7 +53,7 @@ mu0 = 4 * const.pi * 10 ** (-7)
 
 
 # Additional data
-delta = 2
+bt = 2
 kpot = 2
 B = 0.03
 Bmax = 2
@@ -71,16 +75,117 @@ def diam(m):
 def y(m):
     return 1.176*10**-9 * m**4 - 7.995457*10**-7*m**3 + 1.736478*10**-4*m**2 - 9.85489 * 10**-3*m + 0.3865574
 
+def solve_magnet():
+    # global res
+    # global result
+    # global rasm
+    # global wrong
+    # res.destroy()
+    # result.destroy()
+    # rasm.destroy()
+    # wrong.destroy()
+
+    # Get variables
+    n = int(pereferi.get())
+    bm2 = bm / 1000
+    ik = float(eCur.get())
+    d_sr = float(eDiam.get())/1000
+    fi = 1.9 * const.pi * d_sr * B * bm2
+    Iw = kpot * bm2 * fi/ (mu0 * const.pi * d_sr * 3 * bm2)
+    N = Iw/ik
+    Dc = math.sqrt(4 * 10**6 * fi/(const.pi*Bmax))
+    Dper = Dc/2.449
+    Nc = N/2
+    Nper = Nc/n
+
+    # Print solution
+    res_mag = Label(top, text='Результаты расчётов:')
+    res_mag.grid(row=4, column=1)
+
+    space = Label(top, text='\n')
+    space.grid(row=5, column=3)
+
+    res_mag = Label(top, text="""  Магнитный поток в зазоре: \n
+            Число ампер витков: \n
+            Минимальный диаметр центрального сердечника: \n
+            Минимальный диаметр периферийного сердечника: \n
+            Число витков на центральной катушке: \n
+            Число витков на периферийных катушках: \n
+            """)
+    res_mag.grid(row=6, column=0)
+
+    result = Label(top, text=
+    '{} \n \n {} \n \n {} \n \n {} \n \n {}\n \n {}\n \n'.format(
+        reformat(fi),
+        round(Iw),
+        round(Dc),
+        round(Dper),
+        round(Nc),
+        round(Nper)))
+    result.grid(row=6, column=1)
+
+    rasm_mag = Label(top, text="""               Вб \n
+                А в \n
+                мм \n
+                мм \n
+                  \n
+                  \n
+                    """)
+    rasm_mag.grid(row=6, column=2)
+    root.mainloop()
+
+def open_magnet_calc():
+    global top
+    global eCur
+    global eDiam
+    global pereferi
+    top = Toplevel()
+    top.title('Расчёт магнитной системы')
+    top.iconbitmap('Pictures/di2.ico')
+
+    sred_diam = Label(top, text='Средний диаметр: ')
+    sred_diam.grid(row=0, column=0)
+    eDiam = Entry(top)
+    eDiam.grid(row=0, column=1)
+    eDiam.insert(0, '70')
+    draz = Label(top, text='мм')
+    draz.grid(row=0, column=2)
+
+    thrust_m = Label(top, text='Ток в катушках: ')
+    thrust_m.grid(row=1, column=0)
+    eCur = Entry(top)
+    eCur.grid(row=1, column=1)
+    eCur.insert(0, '1')
+    peref = Label(top, text='А')
+    peref.grid(row=1, column=2)
+
+    fuel = Label(top, text='Количество переферийных катушек: ')
+    fuel.grid(row=2, column=0)
+
+    pereferi = StringVar()
+    pereferi.set('3')
+    per_cat = OptionMenu(top, pereferi, '3', '4', '6', '8')
+    per_cat.grid(row=2, column=1)
+
+    rasch_mag = Button(top, text='Рассчитать', command=solve_magnet)
+    rasch_mag.grid(row=3, column=0)
+
 
 def solve():
     global res
     global result
     global rasm
     global wrong
+    global img_label
+    global magnet_button
+    global Dsr
+    global bm
     res.destroy()
     result.destroy()
     rasm.destroy()
     wrong.destroy()
+    img_label.destroy()
+    magnet_button.destroy()
 
     # Get variables
     if vr.get() == 'мН':
@@ -103,6 +208,7 @@ def solve():
     else:
         prop_atom_mass = 127
         prop_fi = 10.45
+
     N = float(ePower.get())
     M = prop_atom_mass * mp
 
@@ -114,7 +220,6 @@ def solve():
     if D < 0:
         wrong = Label(root, text='Невозможно рассчитать')
         wrong.grid(row=5, column=0)
-        root.mainloop()
     else:
         m = (-b - math.sqrt(D))/(2 * a)
         f_eff = F ** 2 / (2 * N * m) * 100
@@ -129,9 +234,10 @@ def solve():
         Dvn = Dsr + bk
         lk = 2 * bk
         st = 0.5 * bk
+        bm = bk + 2 * st + 2 * bt
 
         # Print solution
-        res_label = Label(root, text='Результаты расчётов')
+        res_label = Label(root, text='Результаты расчётов:')
         res_label.grid(row=4, column=1)
 
         space = Label(root, text='\n')
@@ -142,16 +248,17 @@ def solve():
         Удельный импульс: \n
         Разрядное напряжение: \n
         Разрядный ток: \n
-        Средний диаметр: \n
-        Ширина канала: \n
-        Внешний диаметр канала: \n
-        Длина канала: \n
-        Толщина стенки канала: 
+        Средний диаметр (Dср): \n
+        Ширина канала (bk): \n
+        Внешний диаметр канала (D): \n
+        Длина канала (lk): \n
+        Толщина стенки канала (δ): \n
+        Межполюсной зазор: (bm)
         """)
         res.grid(row=6, column=0)
 
         result = Label(root, text =
-        '{} \n \n {} \n \n{} \n \n {} \n \n {} \n \n {} \n \n {} \n \n {} \n \n {} \n \n {}\n'.format(
+        '{} \n \n {} \n \n{} \n \n {} \n \n {} \n \n {} \n \n {} \n \n {} \n \n {} \n \n {}\n \n {}\n'.format(
                                                                              reformat(m*10**6),
                                                                              round(f_eff, 1),
                                                                              round(Iud),
@@ -160,8 +267,11 @@ def solve():
                                                                              round(Dsr),
                                                                              round(bk),
                                                                              round(Dvn),
-                                                                             round(lk), round(st)))
+                                                                             round(lk), round(st), round(bm)))
         result.grid(row=6, column=1)
+
+        # dsr = Label(root, text=str(round(Dsr)))
+        # dsr.place(x=960, y=155)
 
         rasm = Label(root, text="""        мг/c \n
             % \n
@@ -172,18 +282,23 @@ def solve():
             мм \n
             мм \n
             мм \n
-            мм 
+            мм \n
+            мм
                 """)
         rasm.grid(row=6, column=2)
 
-        root.mainloop()
+        image = Image.open('Pictures/Geometry.jpg')
+        resized = image.resize((500, 400), Image.ANTIALIAS)
+        img = ImageTk.PhotoImage(resized)
+        img_label = Label(root, image=img)
+        img_label.grid(row=6, column=5, sticky='nw')
 
+        magnet_button = Button(root, text='Рассчитать магнитную систему', command=open_magnet_calc)
+        magnet_button.grid(row=8, column=0)
+
+        root.mainloop()
 
 myButton = Button(root, text='Рассчитать', command=solve)
 myButton.grid(row=3, column=0)
 
 root.mainloop()
-
-
-def main():
-    pass
