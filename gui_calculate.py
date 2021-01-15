@@ -7,33 +7,33 @@ import math
 root = Tk()
 root.title('Расчет параметров ЭРД')
 root.iconbitmap('Pictures/di.ico')
-# root.geometry('800x500')
+root.geometry('900x600')
 
 power = Label(root, text='Мощность двигателя: ')
-power.grid(row=0, column=2)
+power.grid(row=0, column=0)
 ePower = Entry(root)
-ePower.grid(row=0, column=3)
+ePower.grid(row=0, column=1)
 ePower.insert(0, '1350')
 vt = Label(root, text='Вт')
-vt.grid(row=0, column=4)
+vt.grid(row=0, column=2)
 
 thrust = Label(root, text='Тяга двигателя: ')
-thrust.grid(row=1, column=2)
+thrust.grid(row=1, column=0)
 eThrust = Entry(root)
-eThrust.grid(row=1, column=3)
+eThrust.grid(row=1, column=1)
 eThrust.insert(0, '8')
 vr = StringVar()
 vr.set('г')
 measure = OptionMenu(root, vr, 'г', 'мН')
-measure.grid(row=1, column=4)
+measure.grid(row=1, column=2)
 
 
 fuel = Label(root, text='Рабочее тело: ')
-fuel.grid(row=2, column=2)
+fuel.grid(row=2, column=0)
 propellant = StringVar()
 propellant.set('Xe')
 rt = OptionMenu(root, propellant, 'Xe', 'Ar', 'Bi', 'Kr', 'I')
-rt.grid(row=2, column=3)
+rt.grid(row=2, column=1)
 
 res = Label(root)
 result = Label(root)
@@ -105,7 +105,7 @@ def solve_magnet():
     space = Label(top, text='\n')
     space.grid(row=5, column=3)
 
-    res_mag = Label(top, text="""  Магнитный поток в зазоре: \n
+    res_mag = Label(top, text="""          Магнитный поток в зазоре: \n
             Число ампер витков: \n
             Минимальный диаметр центрального сердечника: \n
             Минимальный диаметр периферийного сердечника: \n
@@ -139,6 +139,7 @@ def open_magnet_calc():
     global eCur
     global eDiam
     global pereferi
+
     top = Toplevel()
     top.title('Расчёт магнитной системы')
     top.iconbitmap('Pictures/di2.ico')
@@ -255,6 +256,7 @@ def solve():
         Толщина стенки канала (δ): \n
         Межполюсной зазор: (bm)
         """)
+        res.configure(anchor='e')
         res.grid(row=6, column=0)
 
         result = Label(root, text =
