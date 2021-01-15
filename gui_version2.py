@@ -5,7 +5,7 @@ import math
 
 root = Tk()
 root.title('Расчет параметров ЭРД')
-root.iconbitmap('Pictures/di.ico')
+root.iconbitmap('Pictures/1.ico')
 
 
 labels = ['Мощность двигателя:', 'Тяга двигателя:', 'Рабочее тело:',
@@ -42,7 +42,7 @@ Ik = 1
 
 class InputLine:
     def __init__(self, master, label_text, row, insert, dimension):
-        self.first = Label(master, text=label_text).grid(row=row, column=0, sticky='e')
+        self.first = Label(master, text=label_text).grid(row=row, column=0, sticky='e', pady=5)
         self.enter = Entry(master)
         self.enter.grid(row=row, column=1)
         self.enter.insert(0, insert)
@@ -70,7 +70,7 @@ def create_second_window():
 
     top = Toplevel()
     top.title('Расчёт магнитной системы')
-    top.iconbitmap('Pictures/di2.ico')
+    top.iconbitmap('Pictures/2.ico')
 
     inserts = ['70', '1']
     med_diam = InputLine(top, labels[14], 0, inserts[0], dimensions[12])
@@ -81,7 +81,7 @@ def create_second_window():
     pereferi.set('3')
     OptionMenu(top, pereferi, '3', '4', '6', '8').grid(row=2, column=1)
 
-    Button(top, text='Рассчитать', command=solve_magnet).grid(row=4, column=0)
+    Button(top, text='Рассчитать', command=solve_magnet).grid(row=4, column=0, pady=15)
 
 
 def calculate_magnet():
@@ -111,7 +111,7 @@ def solve():
         for j in range(11):
             OutputLine(output_frame, labels[j + 3], j, result1[j], dimensions[j + 1])
 
-        img = ImageTk.PhotoImage(Image.open('Pictures/Geometry.jpg').resize((500, 400), Image.ANTIALIAS))
+        img = ImageTk.PhotoImage(Image.open('Pictures/Skhema.png').resize((500, 400), Image.ANTIALIAS))
         Label(output_frame, image=img).grid(row=0, column=5, rowspan=11)
 
         Button(output_frame, text='Рассчитать магнитную систему', command=create_second_window).grid(row=12, column=5,
