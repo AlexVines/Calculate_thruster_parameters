@@ -16,8 +16,8 @@ labels = ['Мощность двигателя:', 'Тяга двигателя:'
           'Средний диаметр:', 'Ток в катушках:', 'Количество переферийных катушек',
 
           'Магнитный поток в зазоре:', 'Число ампер витков:', 'Минимальный диаметр центрального сердечника:',
-          'Минимальный диаметр периферийного сердечника:', 'Число витков на центральной катушке',
-          'Число витков на периферийных катушках']
+          'Минимальный диаметр периферийного сердечника:', 'Число витков на центральной катушке:',
+          'Число витков на периферийных катушках:']
 
 dimensions = ['Вт', 'мг/с', '%', 'сек', 'В', 'А', 'мм', 'мм', 'мм', 'мм', 'мм', 'мм', 'мм', 'A', 'Вб', 'А в', 'мм',
               'мм', '', '']
@@ -42,18 +42,18 @@ Ik = 1
 
 class InputLine:
     def __init__(self, master, label_text, row, insert, dimension):
-        self.first = Label(master, text=label_text).grid(row=row, column=0)
+        self.first = Label(master, text=label_text).grid(row=row, column=0, sticky='e')
         self.enter = Entry(master)
         self.enter.grid(row=row, column=1)
         self.enter.insert(0, insert)
-        self.dimension = Label(master, text=dimension).grid(row=row, column=2)
+        self.dimension = Label(master, text=dimension).grid(row=row, column=2, padx=5)
 
 
 class OutputLine:
     def __init__(self, master, label_text, row, result, dimension):
-        self.first = Label(master, text=label_text).grid(row=row, column=0, padx=5, pady=5)
+        self.first = Label(master, text=label_text).grid(row=row, column=0, padx=5, pady=5, sticky='e')
         self.first = Label(master, text=result).grid(row=row, column=1)
-        self.dimension = Label(master, text=dimension).grid(row=row, column=2)
+        self.dimension = Label(master, text=dimension).grid(row=row, column=2, padx=5)
 
 
 def solve_magnet():
@@ -76,7 +76,7 @@ def create_second_window():
     med_diam = InputLine(top, labels[14], 0, inserts[0], dimensions[12])
     cur = InputLine(top, labels[15], 1, inserts[1], dimensions[13])
 
-    Label(top, text='Количество периферийных').grid(row=2, column=0)
+    Label(top, text='Количество периферийных катушек: ').grid(row=2, column=0, sticky='e')
     pereferi = StringVar()
     pereferi.set('3')
     OptionMenu(top, pereferi, '3', '4', '6', '8').grid(row=2, column=1)
@@ -193,7 +193,7 @@ input_frame = Frame(root, padx=10, pady=10)
 input_frame.pack()
 power = InputLine(input_frame, labels[0], 0, '1350', 'Вт')
 
-Label(input_frame, text='Тяга двигателя: ').grid(row=1, column=0)
+Label(input_frame, text='Тяга двигателя: ').grid(row=1, column=0, sticky='e')
 
 eThrust = Entry(input_frame)
 eThrust.grid(row=1, column=1)
@@ -202,7 +202,7 @@ vr = StringVar()
 vr.set('г')
 OptionMenu(input_frame, vr, 'г', 'мН').grid(row=1, column=2)
 
-Label(input_frame, text='Рабочее тело: ').grid(row=2, column=0)
+Label(input_frame, text='Рабочее тело: ').grid(row=2, column=0, sticky='e')
 propellant = StringVar()
 propellant.set('Xe')
 OptionMenu(input_frame, propellant, 'Xe', 'Ar', 'Bi', 'Kr', 'I').grid(row=2, column=1)
