@@ -15,12 +15,12 @@ labels = ['Мощность двигателя:', 'Тяга двигателя:'
           'Толщина стенки канала (δ):', 'Межполюсной зазор (bm):',
           'Средний диаметр:', 'Ток в катушках:', 'Количество переферийных катушек',
 
-          'Магнитный поток в зазоре:', 'Число ампер витков:', 'Минимальный диаметр центрального сердечника:',
-          'Минимальный диаметр периферийного сердечника:', 'Число витков на центральной катушке:',
+          'Магнитный поток в зазоре:', 'Число ампер витков:', 'Диаметр центрального сердечника:',
+          'Диаметр периферийного сердечника:', 'Число витков на центральной катушке:',
           'Число витков на периферийных катушках:']
 
 dimensions = ['Вт', 'мг/с', '%', 'сек', 'В', 'А', 'мм', 'мм', 'мм', 'мм', 'мм', 'мм', 'мм', 'A', 'Вб', 'А в', 'мм',
-              'мм', '', '']
+              'мм', 'в', 'в']
 
 # CONST
 
@@ -33,8 +33,8 @@ mu0 = 4 * const.pi * 10 ** (-7)
 
 # Additional data
 bt = 2
-kpot = 2
-B = 0.03
+kpot = 2.5
+# B = 0.03
 Bmax = 2
 jkat = 1.5
 Ik = 1
@@ -81,22 +81,25 @@ def create_second_window():
     pereferi.set('3')
     OptionMenu(top, pereferi, '3', '4', '6', '8').grid(row=2, column=1)
 
-    Button(top, text='Рассчитать', command=solve_magnet).grid(row=4, column=0, pady=15)
+    Button(top, text='Рассчитать', command=solve_magnet).grid(row=4, column=0, pady=15, sticky='e')
 
 
 def calculate_magnet():
     bm = calculate()[-1]
+    bk = calculate()[-5]
+    B = 0.15 * bk ** (-0.8)
     n = int(pereferi.get())
     bm2 = bm / 1000
+    Iw = kpot * bm2 * B / mu0
     ik = float(cur.enter.get())
     d_sr = float(med_diam.enter.get()) / 1000
     fi = 1.9 * const.pi * d_sr * B * bm2
-    Iw = kpot * bm2 * fi / (mu0 * const.pi * d_sr * 3 * bm2)
-    N = Iw / ik
-    Dc = math.sqrt(4 * 10 ** 6 * fi / (const.pi * Bmax))
-    Dper = Dc / 2.449
-    Nc = N / 2
-    Nper = Nc / n
+    Nv = Iw / ik
+    Nc = 0.6 * Nv
+    Nper = 0.4 * Nv / n
+    Dc = math.sqrt(8 * 10 ** 6 * fi / (const.pi * Bmax))
+    Dper = Dc / math.sqrt(n)
+
     return [reformat(fi), round(Iw), round(Dc), round(Dper), round(Nc), round(Nper)]
 
 
@@ -125,7 +128,7 @@ def calculate():
         F = float(eThrust.get()) / 1000
     else:
         F = float(eThrust.get()) * g / 1000
-
+    hi = 1.25
     if propellant.get() == 'Xe':
         prop_atom_mass = 131
         prop_fi = 12.13
@@ -144,8 +147,6 @@ def calculate():
     else:
         prop_atom_mass = 127
         prop_fi = 10.45
-        hi = 1.25
-
 
     N = float(power.enter.get())
     M = prop_atom_mass * mp
@@ -165,15 +166,16 @@ def calculate():
         Iud = F / (m * g)
         Vi = g * Iud / 0.835
         Ur = M * Vi ** 2 / (2 * e)
+        Im = e * m / M
+        Ir = Im * hi
 
         if var.get():
             Ur = float(eUr.get())
             m = math.sqrt((F**2 * M)/(2*0.835**2 * e * (Ur - 3.7 * prop_fi)))
             f_eff = F ** 2 / (2 * N * m) * 100
             Iud = F / (m * g)
+            Ir = N / Ur
 
-        Im = e * m * 1.25 / M
-        Ir = Im * hi
         Dsr = diam(m * 10 ** 6)
         w = y(m * 10 ** 6)
         Sk = N / w
@@ -222,14 +224,14 @@ propellant.set('Xe')
 OptionMenu(input_frame, propellant, 'Xe', 'Ar', 'Kr').grid(row=2, column=1)
 
 var = BooleanVar()
-c = Checkbutton(input_frame, text='Задать Ur', variable=var)
+c = Checkbutton(input_frame, text='Задать разрядное напряжение: ', variable=var)
 c.grid(row=3, column=0, sticky='e')
 eUr = Entry(input_frame)
 eUr.grid(row=3, column=1)
 eUr.insert(0, '200')
 Label(input_frame, text='В').grid(row=3, column=2)
 
-Button(input_frame, text='Рассчитать', command=solve).grid(row=4, column=0)
+Button(input_frame, text='Рассчитать', command=solve).grid(row=4, column=0, sticky='e', pady=20)
 
 # Create output field
 output_frame = Frame(root, padx=20, pady=20)
