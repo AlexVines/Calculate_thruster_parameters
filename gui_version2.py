@@ -129,27 +129,33 @@ def calculate():
     if propellant.get() == 'Xe':
         prop_atom_mass = 131
         prop_fi = 12.13
+        hi = 1.31
     elif propellant.get() == 'Ar':
         prop_atom_mass = 40
         prop_fi = 15.76
+        hi = 1.14
     elif propellant.get() == 'Bi':
         prop_atom_mass = 209
         prop_fi = 7.29
     elif propellant.get() == 'Kr':
         prop_atom_mass = 84
         prop_fi = 14
+        hi = 1.27
     else:
         prop_atom_mass = 127
         prop_fi = 10.45
+        hi = 1.25
+
 
     N = float(power.enter.get())
     M = prop_atom_mass * mp
 
     # Calculations
     a = 3.7 * prop_fi * e / M
-    b = - N / 1.25
+    b = - N / hi
     c = F ** 2 / (2 * 0.835 ** 2)
     D = b ** 2 - 4 * a * c
+
     if D < 0:
         wrong = Label(output_frame, text='Невозможно получить заданные параметры')
         wrong.grid(row=5, column=0)
@@ -159,7 +165,15 @@ def calculate():
         Iud = F / (m * g)
         Vi = g * Iud / 0.835
         Ur = M * Vi ** 2 / (2 * e)
-        Ir = e * m * 1.25 / M
+
+        if var.get():
+            Ur = float(eUr.get())
+            m = math.sqrt((F**2 * M)/(2*0.835**2 * e * (Ur - 3.7 * prop_fi)))
+            f_eff = F ** 2 / (2 * N * m) * 100
+            Iud = F / (m * g)
+
+        Im = e * m * 1.25 / M
+        Ir = Im * hi
         Dsr = diam(m * 10 ** 6)
         w = y(m * 10 ** 6)
         Sk = N / w
@@ -205,7 +219,15 @@ OptionMenu(input_frame, vr, 'г', 'мН').grid(row=1, column=2)
 Label(input_frame, text='Рабочее тело: ').grid(row=2, column=0, sticky='e')
 propellant = StringVar()
 propellant.set('Xe')
-OptionMenu(input_frame, propellant, 'Xe', 'Ar', 'Bi', 'Kr', 'I').grid(row=2, column=1)
+OptionMenu(input_frame, propellant, 'Xe', 'Ar', 'Kr').grid(row=2, column=1)
+
+var = BooleanVar()
+c = Checkbutton(input_frame, text='Задать Ur', variable=var)
+c.grid(row=3, column=0, sticky='e')
+eUr = Entry(input_frame)
+eUr.grid(row=3, column=1)
+eUr.insert(0, '200')
+Label(input_frame, text='В').grid(row=3, column=2)
 
 Button(input_frame, text='Рассчитать', command=solve).grid(row=4, column=0)
 
