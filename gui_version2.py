@@ -157,19 +157,20 @@ def calculate():
     c = F ** 2 / (2 * 0.835 ** 2)
     D = b ** 2 - 4 * a * c
 
-    if D < 0:
+    if D < 0 and not var.get():
         wrong = Label(output_frame, text='Невозможно получить заданные параметры')
         wrong.grid(row=5, column=0)
     else:
-        m = (-b - math.sqrt(D)) / (2 * a)
-        f_eff = F ** 2 / (2 * N * m) * 100
-        Iud = F / (m * g)
-        Vi = g * Iud / 0.835
-        Ur = M * Vi ** 2 / (2 * e)
-        Im = e * m / M
-        Ir = Im * hi
+        if not var.get():
+            m = (-b - math.sqrt(D)) / (2 * a)
+            f_eff = F ** 2 / (2 * N * m) * 100
+            Iud = F / (m * g)
+            Vi = g * Iud / 0.835
+            Ur = M * Vi ** 2 / (2 * e)
+            Im = e * m / M
+            Ir = Im * hi
 
-        if var.get():
+        else:
             Ur = float(eUr.get())
             m = math.sqrt((F**2 * M)/(2*0.835**2 * e * (Ur - 3.7 * prop_fi)))
             f_eff = F ** 2 / (2 * N * m) * 100
@@ -177,7 +178,7 @@ def calculate():
             Ir = N / Ur
 
         Dsr = diam(m * 10 ** 6)
-        w = y(m * 10 ** 6)
+        w = y(Dsr)
         Sk = N / w
         bk = Sk / (const.pi * Dsr)
         Dvn = Dsr + bk
