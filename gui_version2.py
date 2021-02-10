@@ -7,7 +7,6 @@ root = Tk()
 root.title('Расчет параметров ЭРД')
 root.iconbitmap('Pictures/1.ico')
 
-
 labels = ['Мощность двигателя:', 'Тяга двигателя:', 'Рабочее тело:',
 
           'Массовый расход:', 'Тяговый КПД:', 'Удельный импульс:', 'Разрядное напряжение:', 'Разрядный ток:',
@@ -29,7 +28,6 @@ e = const.e
 me = const.electron_mass
 g = const.g
 mu0 = 4 * const.pi * 10 ** (-7)
-
 
 # Additional data
 bt = 2
@@ -118,7 +116,8 @@ def solve():
         Label(output_frame, image=img).grid(row=0, column=5, rowspan=11)
 
         Button(output_frame, text='Рассчитать магнитную систему', command=create_second_window).grid(row=12, column=5,
-                                                                                               pady=20, sticky='w')
+                                                                                                     pady=20,
+                                                                                                     sticky='w')
         root.mainloop()
 
 
@@ -172,7 +171,7 @@ def calculate():
 
         else:
             Ur = float(eUr.get())
-            m = math.sqrt((F**2 * M)/(2*0.835**2 * e * (Ur - 3.7 * prop_fi)))
+            m = math.sqrt((F ** 2 * M) / (2 * 0.835 ** 2 * e * (Ur - 3.7 * prop_fi)))
             f_eff = F ** 2 / (2 * N * m) * 100
             Iud = F / (m * g)
             Ir = N / Ur
@@ -185,7 +184,7 @@ def calculate():
         lk = 2 * bk
         st = 0.5 * bk
         bm = bk + 2 * st + 2 * bt
-        results = [reformat(m*10**6), round(f_eff, 1), round(Iud), round(Ur), reformat(Ir), round(Dsr), round(bk),
+        results = [reformat(m * 10 ** 6), round(f_eff, 1), round(Iud), round(Ur), reformat(Ir), round(Dsr), round(bk),
                    round(Dvn), round(lk), round(st), round(bm)]
         return results
 
@@ -198,11 +197,12 @@ def reformat(num):
 
 
 def diam(m):
-    return 0.00195 * m**3 - 0.267035 * m**2 + 13.149984 * m + 20.49869
+    return 0.00195 * m ** 3 - 0.267035 * m ** 2 + 13.149984 * m + 20.49869
 
 
 def y(m):
-    return 1.176*10**-9 * m**4 - 7.995457*10**-7*m**3 + 1.736478*10**-4*m**2 - 9.85489 * 10**-3*m + 0.3865574
+    return 1.176 * 10 ** -9 * m ** 4 - 7.995457 * 10 ** -7 * m ** 3 + 1.736478 * 10 ** -4 * m ** 2 - 9.85489 * \
+           10 ** -3 * m + 0.3865574
 
 
 # Create input field
